@@ -39,8 +39,8 @@ namespace SoulReaverPCTextureUtility
         delegate void controlDelegate();
 
 		//threads for opening/exporting files and getting the current texture
-		protected Thread openFileThread;
 		protected Thread exportThread;
+        protected Thread importThread;
 		protected Thread getTextureThread;
 
 		//file objects for IO
@@ -88,7 +88,7 @@ namespace SoulReaverPCTextureUtility
 		internal System.Windows.Forms.MenuItem mnuExportCurrent;
 		internal System.Windows.Forms.MenuItem mnuExportAll;
 		internal System.Windows.Forms.MenuItem mnuImport;
-		internal System.Windows.Forms.MenuItem mnuImportTexture;
+		internal System.Windows.Forms.MenuItem mnuImportCurrent;
 		internal System.Windows.Forms.MenuItem mnuHelp;
 		internal System.Windows.Forms.MenuItem mnuAbout;
 		internal System.Windows.Forms.Timer tmrClock;
@@ -98,7 +98,8 @@ namespace SoulReaverPCTextureUtility
 		internal System.Windows.Forms.PictureBox imgDisplay;
 		internal System.Windows.Forms.Panel pnlStatus;
 		internal System.Windows.Forms.Label lblStatus;
-		private System.ComponentModel.IContainer components;
+        private MenuItem mnuImportAll;
+        private System.ComponentModel.IContainer components;
 
 		public frmMain()
 		{
@@ -136,181 +137,191 @@ namespace SoulReaverPCTextureUtility
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
-			System.Resources.ResourceManager resources = new System.Resources.ResourceManager(typeof(frmMain));
-			this.mnuMenu = new System.Windows.Forms.MainMenu();
-			this.mnuFile = new System.Windows.Forms.MenuItem();
-			this.mnuOpenFile = new System.Windows.Forms.MenuItem();
-			this.mnuExit = new System.Windows.Forms.MenuItem();
-			this.mnuExport = new System.Windows.Forms.MenuItem();
-			this.mnuExportCurrent = new System.Windows.Forms.MenuItem();
-			this.mnuExportAll = new System.Windows.Forms.MenuItem();
-			this.mnuImport = new System.Windows.Forms.MenuItem();
-			this.mnuImportTexture = new System.Windows.Forms.MenuItem();
-			this.mnuHelp = new System.Windows.Forms.MenuItem();
-			this.mnuAbout = new System.Windows.Forms.MenuItem();
-			this.tmrClock = new System.Windows.Forms.Timer(this.components);
-			this.gboTextureSet = new System.Windows.Forms.GroupBox();
-			this.cmdGo = new System.Windows.Forms.Button();
-			this.cboCurrentTexture = new System.Windows.Forms.ComboBox();
-			this.imgDisplay = new System.Windows.Forms.PictureBox();
-			this.pnlStatus = new System.Windows.Forms.Panel();
-			this.lblStatus = new System.Windows.Forms.Label();
-			this.gboTextureSet.SuspendLayout();
-			this.pnlStatus.SuspendLayout();
-			this.SuspendLayout();
-			// 
-			// mnuMenu
-			// 
-			this.mnuMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					this.mnuFile,
-																					this.mnuExport,
-																					this.mnuImport,
-																					this.mnuHelp});
-			// 
-			// mnuFile
-			// 
-			this.mnuFile.Index = 0;
-			this.mnuFile.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					this.mnuOpenFile,
-																					this.mnuExit});
-			this.mnuFile.Text = "&File";
-			// 
-			// mnuOpenFile
-			// 
-			this.mnuOpenFile.Index = 0;
-			this.mnuOpenFile.Text = "&Open Texture File";
-			this.mnuOpenFile.Click += new System.EventHandler(this.mnuOpenFile_Click);
-			// 
-			// mnuExit
-			// 
-			this.mnuExit.Index = 1;
-			this.mnuExit.Text = "E&xit";
-			this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
-			// 
-			// mnuExport
-			// 
-			this.mnuExport.Enabled = false;
-			this.mnuExport.Index = 1;
-			this.mnuExport.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					  this.mnuExportCurrent,
-																					  this.mnuExportAll});
-			this.mnuExport.Text = "&Export";
-			// 
-			// mnuExportCurrent
-			// 
-			this.mnuExportCurrent.Index = 0;
-			this.mnuExportCurrent.Text = "&Current Texture Set";
-			this.mnuExportCurrent.Click += new System.EventHandler(this.mnuExportCurrent_Click);
-			// 
-			// mnuExportAll
-			// 
-			this.mnuExportAll.Index = 1;
-			this.mnuExportAll.Text = "&All Texture Sets";
-			this.mnuExportAll.Click += new System.EventHandler(this.mnuExportAll_Click);
-			// 
-			// mnuImport
-			// 
-			this.mnuImport.Enabled = false;
-			this.mnuImport.Index = 2;
-			this.mnuImport.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					  this.mnuImportTexture});
-			this.mnuImport.Text = "&Import";
-			// 
-			// mnuImportTexture
-			// 
-			this.mnuImportTexture.Index = 0;
-			this.mnuImportTexture.Text = "&Replace Current Texture Set";
-			this.mnuImportTexture.Click += new System.EventHandler(this.mnuImportTexture_Click);
-			// 
-			// mnuHelp
-			// 
-			this.mnuHelp.Index = 3;
-			this.mnuHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																					this.mnuAbout});
-			this.mnuHelp.Text = "&Help";
-			// 
-			// mnuAbout
-			// 
-			this.mnuAbout.Index = 0;
-			this.mnuAbout.Text = "&About";
-			this.mnuAbout.Click += new System.EventHandler(this.mnuAbout_Click);
-			// 
-			// tmrClock
-			// 
-			this.tmrClock.Tick += new System.EventHandler(this.tmrClock_Tick);
-			// 
-			// gboTextureSet
-			// 
-			this.gboTextureSet.Controls.Add(this.cmdGo);
-			this.gboTextureSet.Controls.Add(this.cboCurrentTexture);
-			this.gboTextureSet.Location = new System.Drawing.Point(8, 8);
-			this.gboTextureSet.Name = "gboTextureSet";
-			this.gboTextureSet.Size = new System.Drawing.Size(256, 56);
-			this.gboTextureSet.TabIndex = 5;
-			this.gboTextureSet.TabStop = false;
-			this.gboTextureSet.Text = "Texture Set";
-			// 
-			// cmdGo
-			// 
-			this.cmdGo.Enabled = false;
-			this.cmdGo.Location = new System.Drawing.Point(168, 24);
-			this.cmdGo.Name = "cmdGo";
-			this.cmdGo.Size = new System.Drawing.Size(72, 23);
-			this.cmdGo.TabIndex = 1;
-			this.cmdGo.Text = "Go";
-			this.cmdGo.Click += new System.EventHandler(this.cmdGo_Click);
-			// 
-			// cboCurrentTexture
-			// 
-			this.cboCurrentTexture.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.cboCurrentTexture.Location = new System.Drawing.Point(16, 24);
-			this.cboCurrentTexture.Name = "cboCurrentTexture";
-			this.cboCurrentTexture.Size = new System.Drawing.Size(136, 21);
-			this.cboCurrentTexture.TabIndex = 0;
-			// 
-			// imgDisplay
-			// 
-			this.imgDisplay.BackColor = System.Drawing.Color.Black;
-			this.imgDisplay.Location = new System.Drawing.Point(8, 72);
-			this.imgDisplay.Name = "imgDisplay";
-			this.imgDisplay.Size = new System.Drawing.Size(256, 256);
-			this.imgDisplay.TabIndex = 4;
-			this.imgDisplay.TabStop = false;
-			// 
-			// pnlStatus
-			// 
-			this.pnlStatus.Controls.Add(this.lblStatus);
-			this.pnlStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.pnlStatus.Location = new System.Drawing.Point(0, 329);
-			this.pnlStatus.Name = "pnlStatus";
-			this.pnlStatus.Size = new System.Drawing.Size(272, 32);
-			this.pnlStatus.TabIndex = 3;
-			// 
-			// lblStatus
-			// 
-			this.lblStatus.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.lblStatus.Location = new System.Drawing.Point(0, 0);
-			this.lblStatus.Name = "lblStatus";
-			this.lblStatus.Size = new System.Drawing.Size(272, 32);
-			this.lblStatus.TabIndex = 0;
-			this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// frmMain
-			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(272, 361);
-			this.Controls.Add(this.pnlStatus);
-			this.Controls.Add(this.gboTextureSet);
-			this.Controls.Add(this.imgDisplay);
-			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Menu = this.mnuMenu;
-			this.Name = "frmMain";
-			this.Text = "Soul Reaver PC Texture Utility";
-			this.Load += new System.EventHandler(this.frmMain_Load);
-			this.gboTextureSet.ResumeLayout(false);
-			this.pnlStatus.ResumeLayout(false);
-			this.ResumeLayout(false);
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+            this.mnuMenu = new System.Windows.Forms.MainMenu(this.components);
+            this.mnuFile = new System.Windows.Forms.MenuItem();
+            this.mnuOpenFile = new System.Windows.Forms.MenuItem();
+            this.mnuExit = new System.Windows.Forms.MenuItem();
+            this.mnuExport = new System.Windows.Forms.MenuItem();
+            this.mnuExportCurrent = new System.Windows.Forms.MenuItem();
+            this.mnuExportAll = new System.Windows.Forms.MenuItem();
+            this.mnuImport = new System.Windows.Forms.MenuItem();
+            this.mnuImportCurrent = new System.Windows.Forms.MenuItem();
+            this.mnuImportAll = new System.Windows.Forms.MenuItem();
+            this.mnuHelp = new System.Windows.Forms.MenuItem();
+            this.mnuAbout = new System.Windows.Forms.MenuItem();
+            this.tmrClock = new System.Windows.Forms.Timer(this.components);
+            this.gboTextureSet = new System.Windows.Forms.GroupBox();
+            this.cmdGo = new System.Windows.Forms.Button();
+            this.cboCurrentTexture = new System.Windows.Forms.ComboBox();
+            this.imgDisplay = new System.Windows.Forms.PictureBox();
+            this.pnlStatus = new System.Windows.Forms.Panel();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.gboTextureSet.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imgDisplay)).BeginInit();
+            this.pnlStatus.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // mnuMenu
+            // 
+            this.mnuMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuFile,
+            this.mnuExport,
+            this.mnuImport,
+            this.mnuHelp});
+            // 
+            // mnuFile
+            // 
+            this.mnuFile.Index = 0;
+            this.mnuFile.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuOpenFile,
+            this.mnuExit});
+            this.mnuFile.Text = "&File";
+            // 
+            // mnuOpenFile
+            // 
+            this.mnuOpenFile.Index = 0;
+            this.mnuOpenFile.Text = "&Open Texture File";
+            this.mnuOpenFile.Click += new System.EventHandler(this.mnuOpenFile_Click);
+            // 
+            // mnuExit
+            // 
+            this.mnuExit.Index = 1;
+            this.mnuExit.Text = "E&xit";
+            this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
+            // 
+            // mnuExport
+            // 
+            this.mnuExport.Enabled = false;
+            this.mnuExport.Index = 1;
+            this.mnuExport.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuExportCurrent,
+            this.mnuExportAll});
+            this.mnuExport.Text = "&Export";
+            // 
+            // mnuExportCurrent
+            // 
+            this.mnuExportCurrent.Index = 0;
+            this.mnuExportCurrent.Text = "&Current Texture Set";
+            this.mnuExportCurrent.Click += new System.EventHandler(this.mnuExportCurrent_Click);
+            // 
+            // mnuExportAll
+            // 
+            this.mnuExportAll.Index = 1;
+            this.mnuExportAll.Text = "&All Texture Sets";
+            this.mnuExportAll.Click += new System.EventHandler(this.mnuExportAll_Click);
+            // 
+            // mnuImport
+            // 
+            this.mnuImport.Enabled = false;
+            this.mnuImport.Index = 2;
+            this.mnuImport.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuImportCurrent,
+            this.mnuImportAll});
+            this.mnuImport.Text = "&Import";
+            // 
+            // mnuImportCurrent
+            // 
+            this.mnuImportCurrent.Index = 0;
+            this.mnuImportCurrent.Text = "&Current Texture Set";
+            this.mnuImportCurrent.Click += new System.EventHandler(this.mnuImportCurrent_Click);
+            // 
+            // mnuImportAll
+            // 
+            this.mnuImportAll.Index = 1;
+            this.mnuImportAll.Text = "&All Texture Sets";
+            this.mnuImportAll.Click += new System.EventHandler(this.mnuImportAll_Click);
+            // 
+            // mnuHelp
+            // 
+            this.mnuHelp.Index = 3;
+            this.mnuHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuAbout});
+            this.mnuHelp.Text = "&Help";
+            // 
+            // mnuAbout
+            // 
+            this.mnuAbout.Index = 0;
+            this.mnuAbout.Text = "&About";
+            this.mnuAbout.Click += new System.EventHandler(this.mnuAbout_Click);
+            // 
+            // tmrClock
+            // 
+            this.tmrClock.Tick += new System.EventHandler(this.tmrClock_Tick);
+            // 
+            // gboTextureSet
+            // 
+            this.gboTextureSet.Controls.Add(this.cmdGo);
+            this.gboTextureSet.Controls.Add(this.cboCurrentTexture);
+            this.gboTextureSet.Location = new System.Drawing.Point(8, 8);
+            this.gboTextureSet.Name = "gboTextureSet";
+            this.gboTextureSet.Size = new System.Drawing.Size(256, 56);
+            this.gboTextureSet.TabIndex = 5;
+            this.gboTextureSet.TabStop = false;
+            this.gboTextureSet.Text = "Texture Set";
+            // 
+            // cmdGo
+            // 
+            this.cmdGo.Enabled = false;
+            this.cmdGo.Location = new System.Drawing.Point(168, 24);
+            this.cmdGo.Name = "cmdGo";
+            this.cmdGo.Size = new System.Drawing.Size(72, 23);
+            this.cmdGo.TabIndex = 1;
+            this.cmdGo.Text = "Go";
+            this.cmdGo.Click += new System.EventHandler(this.cmdGo_Click);
+            // 
+            // cboCurrentTexture
+            // 
+            this.cboCurrentTexture.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboCurrentTexture.Location = new System.Drawing.Point(16, 24);
+            this.cboCurrentTexture.Name = "cboCurrentTexture";
+            this.cboCurrentTexture.Size = new System.Drawing.Size(136, 21);
+            this.cboCurrentTexture.TabIndex = 0;
+            // 
+            // imgDisplay
+            // 
+            this.imgDisplay.BackColor = System.Drawing.Color.Black;
+            this.imgDisplay.Location = new System.Drawing.Point(8, 72);
+            this.imgDisplay.Name = "imgDisplay";
+            this.imgDisplay.Size = new System.Drawing.Size(256, 256);
+            this.imgDisplay.TabIndex = 4;
+            this.imgDisplay.TabStop = false;
+            // 
+            // pnlStatus
+            // 
+            this.pnlStatus.Controls.Add(this.lblStatus);
+            this.pnlStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlStatus.Location = new System.Drawing.Point(0, 289);
+            this.pnlStatus.Name = "pnlStatus";
+            this.pnlStatus.Size = new System.Drawing.Size(272, 32);
+            this.pnlStatus.TabIndex = 3;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblStatus.Location = new System.Drawing.Point(0, 0);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(272, 32);
+            this.lblStatus.TabIndex = 0;
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // frmMain
+            // 
+            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.ClientSize = new System.Drawing.Size(272, 321);
+            this.Controls.Add(this.pnlStatus);
+            this.Controls.Add(this.gboTextureSet);
+            this.Controls.Add(this.imgDisplay);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Menu = this.mnuMenu;
+            this.Name = "frmMain";
+            this.Text = "Soul Reaver PC Texture Utility";
+            this.Load += new System.EventHandler(this.frmMain_Load);
+            this.gboTextureSet.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.imgDisplay)).EndInit();
+            this.pnlStatus.ResumeLayout(false);
+            this.ResumeLayout(false);
 
 		}
 		#endregion
@@ -350,7 +361,7 @@ namespace SoulReaverPCTextureUtility
 			closeFile();
             try
             {
-                exportThread.Abort();
+                importThread.Abort();
             }
             catch (Exception ex)
             {
@@ -358,7 +369,7 @@ namespace SoulReaverPCTextureUtility
             }
             try
             {
-                openFileThread.Abort();
+                exportThread.Abort();
             }
             catch (Exception ex)
             {
@@ -401,16 +412,16 @@ namespace SoulReaverPCTextureUtility
 			folderDialogue = new FolderBrowserDialog();
 			folderDialogue.ShowNewFolderButton = true;
 			result = folderDialogue.ShowDialog();
-			if (result == DialogResult.OK)
-			{
-            exportPath = folderDialogue.SelectedPath;
-            exportThread = new Thread(new ThreadStart(exportAll));
-            exportThread.Start();
-            //exportAll();
-			}
+            if (result == DialogResult.OK)
+            {
+                exportPath = folderDialogue.SelectedPath;
+                exportThread = new Thread(new ThreadStart(exportAll));
+                exportThread.Start();
+                //exportAll();
+            }
 		}
 
-		private void mnuImportTexture_Click(object sender, System.EventArgs e)
+		private void mnuImportCurrent_Click(object sender, System.EventArgs e)
 		{
 			OpenFileDialog fDialogue;
 			DialogResult result;
@@ -424,12 +435,28 @@ namespace SoulReaverPCTextureUtility
 			{
 				currentTexture = (uint)cboCurrentTexture.SelectedIndex;
 				importPath = fDialogue.FileName;
-                openFileThread = new Thread(new ThreadStart(importTexture));
-                openFileThread.Start();
+                importThread = new Thread(new ThreadStart(importCurrent));
+                importThread.Start();
  			}
-		}
+        }
 
-		private void mnuAbout_Click(object sender, System.EventArgs e)
+        private void mnuImportAll_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderDialogue;
+            DialogResult result;
+            folderDialogue = new FolderBrowserDialog();
+            folderDialogue.ShowNewFolderButton = false;
+            result = folderDialogue.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                importPath = folderDialogue.SelectedPath;
+                importThread = new Thread(new ThreadStart(importAll));
+                importThread.Start();
+                //importAll();
+            }
+        }
+
+        private void mnuAbout_Click(object sender, System.EventArgs e)
 		{
             MessageBox.Show("Soul Reaver PC Texture Utility v2.3\nCopyright 2006-2007 Ben Lincoln\nhttp://www.thelostworlds.net/", "About This Application", MessageBoxButtons.OK, MessageBoxIcon.None);
 		}
@@ -544,10 +571,15 @@ namespace SoulReaverPCTextureUtility
 		}
 
 		private void exportCurrent()
-		{
+        {
+            controlDelegate cDisable = new controlDelegate(disableControls);
+            controlDelegate cEnable = new controlDelegate(enableControls);
             mDelegate dcUpdateStatus = new mDelegate(updateStatus);
+
+            this.Invoke(cDisable);
             this.Invoke(dcUpdateStatus, "Exporting current texture");
-			try
+
+            try
 			{
 				bufferImage.Save(exportPath, System.Drawing.Imaging.ImageFormat.Png);
 			}
@@ -555,6 +587,8 @@ namespace SoulReaverPCTextureUtility
 			{
 				MessageBox.Show("There was an error saving the file. Try a different location and/or filename.", "IO Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
+
+            this.Invoke(cEnable);
             this.Invoke(dcUpdateStatus, "Ready");
 		}
 
@@ -563,6 +597,7 @@ namespace SoulReaverPCTextureUtility
             mDelegate dcUpdateStatus = new mDelegate(updateStatus);
             controlDelegate cDisable = new controlDelegate(disableControls);
             controlDelegate cEnable = new controlDelegate(enableControls);
+
             this.Invoke(cDisable);
 
 			int iEA, jEA;
@@ -574,15 +609,185 @@ namespace SoulReaverPCTextureUtility
  				tempBitmap = getTexture((long)(4096 + (iEA * 256 * 256 * 2)));
                 tempBitmap.Save(exportPath + "\\Texture-" + zeroFill(iEA.ToString(), 5) + ".PNG", System.Drawing.Imaging.ImageFormat.Png);
 			}
+
             this.Invoke(cEnable);
             this.Invoke(dcUpdateStatus, "Ready");
         }
 
-		#endregion
+        private void importCurrent()
+        {
+            mDelegate dcUpdateStatus = new mDelegate(updateStatus);
+            controlDelegate cDisable = new controlDelegate(disableControls);
+            controlDelegate cEnable = new controlDelegate(enableControls);
 
-		#region Image functions
+            this.Invoke(cDisable);
+            this.Invoke(dcUpdateStatus, "Importing replacement texture");
 
-		private void displayCurrentTexture()
+            Bitmap tempBitmap;
+            tempBitmap = new Bitmap(importPath);
+            if ((tempBitmap.Size.Width != 256) || (tempBitmap.Size.Height != 256))
+            {
+                MessageBox.Show("You MUST use a PNG image that is 256x256 pixels", "Incorrect File Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            int iGT, jGT;
+            ushort a, r, g, b, pixelData;
+            int aFactor, rFactor, gFactor, bFactor;
+            Color colour;
+
+            aFactor = 1;
+            rFactor = 3;
+            gFactor = 3;
+            bFactor = 3;
+
+            colour = new Color();
+
+            fStream.Seek(4096 + (currentTexture * 256 * 256 * 2), SeekOrigin.Begin);
+
+            for (iGT = 0; iGT <= 255; iGT++)
+            {
+                for (jGT = 0; jGT <= 255; jGT++)
+                {
+                    colour = tempBitmap.GetPixel(jGT, iGT);
+                    a = (ushort)(colour.A >> aFactor);
+                    r = (ushort)(colour.R >> rFactor);
+                    g = (ushort)(colour.G >> gFactor);
+                    b = (ushort)(colour.B >> bFactor);
+
+                    a <<= 15;
+                    r <<= 10;
+                    g <<= 5;
+
+                    pixelData = (ushort)(a | r | g | b);
+
+                    bWriter.Write(pixelData);
+                }
+            }
+
+            this.Invoke(dcUpdateStatus, "Loading rewritten texture");
+
+            cboCurrentTexture.SelectedIndex = (int)currentTexture;
+
+            bufferImage = getTexture(4096 + (currentTexture * 256 * 256 * 2));
+
+            imageUpdated = true;
+
+            this.Invoke(cEnable);
+            this.Invoke(dcUpdateStatus, "Ready");
+        }
+
+        private void importAll()
+        {
+            mDelegate dcUpdateStatus = new mDelegate(updateStatus);
+            controlDelegate cDisable = new controlDelegate(disableControls);
+            controlDelegate cEnable = new controlDelegate(enableControls);
+
+            this.Invoke(cDisable);
+
+            DirectoryInfo directoryInfo = new DirectoryInfo(importPath);
+            FileInfo[] fileInfos = directoryInfo.GetFiles("*.png", SearchOption.TopDirectoryOnly);
+            System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("Texture-([0-9]+).(PNG)");
+            System.Collections.Generic.SortedDictionary<uint, string> dictionary = new System.Collections.Generic.SortedDictionary<uint, string>();
+            uint highestID = 0;
+            foreach (FileInfo fileInfo in fileInfos)
+            {
+                if (regex.IsMatch(fileInfo.Name))
+                {
+                    string[] tokens = regex.Split(fileInfo.Name);
+                    if (tokens.Length == 4 && UInt32.TryParse(tokens[1], out uint index))
+                    {
+                        dictionary.Add(index, fileInfo.Name);
+                        if (index > highestID)
+                        {
+                            highestID = index;
+                        }
+                    }
+                }
+            }
+
+            if (dictionary.Count > 0)
+            {
+                totalTextures = highestID;
+                fStream.Position = 0;
+
+                int iEA, jEA;
+                Bitmap tempBitmap = null;
+
+                for (iEA = 0; iEA <= totalTextures; iEA++)
+                {
+                    this.Invoke(dcUpdateStatus, "Exporting texture " + iEA + " of " + totalTextures);
+
+                    if (dictionary.ContainsKey((uint)iEA))
+                    {
+                        tempBitmap = new Bitmap(Path.Combine(importPath, dictionary[(uint)iEA]));
+                        if ((tempBitmap.Size.Width != 256) || (tempBitmap.Size.Height != 256))
+                        {
+                            tempBitmap.Dispose();
+                            tempBitmap = new Bitmap(256, 256);
+                        }
+                    }
+                    else
+                    {
+                        tempBitmap = new Bitmap(256, 256);
+                    }
+
+                    int iGT, jGT;
+                    ushort a, r, g, b, pixelData;
+                    int aFactor, rFactor, gFactor, bFactor;
+                    Color colour;
+
+                    aFactor = 1;
+                    rFactor = 3;
+                    gFactor = 3;
+                    bFactor = 3;
+
+                    colour = new Color();
+
+                    fStream.Seek(4096 + (iEA * 256 * 256 * 2), SeekOrigin.Begin);
+
+                    for (iGT = 0; iGT <= 255; iGT++)
+                    {
+                        for (jGT = 0; jGT <= 255; jGT++)
+                        {
+                            colour = tempBitmap.GetPixel(jGT, iGT);
+                            a = (ushort)(colour.A >> aFactor);
+                            r = (ushort)(colour.R >> rFactor);
+                            g = (ushort)(colour.G >> gFactor);
+                            b = (ushort)(colour.B >> bFactor);
+
+                            a <<= 15;
+                            r <<= 10;
+                            g <<= 5;
+
+                            pixelData = (ushort)(a | r | g | b);
+
+                            bWriter.Write(pixelData);
+                        }
+                    }
+
+                    tempBitmap.Dispose();
+                }
+
+                fileLength = (ulong)fStream.Length;
+
+                fStream.Seek(2, SeekOrigin.Begin);
+                bWriter.Write((ushort)dictionary.Count);
+                fStream.Seek(0, SeekOrigin.Begin);
+
+                //bufferImage = getTexture(4096 + (currentTexture * 256 * 256 * 2));
+                //imageUpdated = true;
+            }
+
+            this.Invoke(cEnable);
+            this.Invoke(dcUpdateStatus, "Ready");
+        }
+
+        #endregion
+
+        #region Image functions
+
+        private void displayCurrentTexture()
 		{
             mDelegate dcUpdateStatus = new mDelegate(updateStatus);
             this.Invoke(dcUpdateStatus, "Reading texture");
@@ -649,72 +854,9 @@ namespace SoulReaverPCTextureUtility
 			return retBitmap;
 		}
 
-		private void importTexture()
-		{
-            mDelegate dcUpdateStatus = new mDelegate(updateStatus);
-            
-			disableControls();
-			mnuOpenFile.Enabled = false;
-            this.Invoke(dcUpdateStatus, "Importing replacement texture");
+        #endregion
 
-			Bitmap tempBitmap;
-			tempBitmap = new Bitmap(importPath);
-			if ((tempBitmap.Size.Width != 256) || (tempBitmap.Size.Height != 256))
-			{
-				MessageBox.Show("You MUST use a PNG image that is 256x256 pixels", "Incorrect File Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-
-			int iGT, jGT;
-			ushort a, r, g, b, pixelData;
-			int aFactor, rFactor, gFactor, bFactor;
-			Color colour;
-
-			aFactor = 1;
-			rFactor = 3;
-			gFactor = 3;
-			bFactor = 3;
-
-			colour = new Color();
-
-			fStream.Seek(4096 + (currentTexture * 256 * 256 * 2), SeekOrigin.Begin);
-
-			for (iGT = 0; iGT <= 255; iGT++)
-			{
-				for (jGT = 0; jGT <= 255; jGT++)
-				{
-					colour = tempBitmap.GetPixel(jGT, iGT);
-					a = (ushort)(colour.A >> aFactor);
-					r = (ushort)(colour.R >> rFactor);
-					g = (ushort)(colour.G >> gFactor);
-					b = (ushort)(colour.B >> bFactor);
-
-					a <<= 15;
-					r <<= 10;
-					g <<= 5;
-
-					pixelData = (ushort)(a | r | g | b);
-
-					bWriter.Write(pixelData);
-				}
-			}
-
-            this.Invoke(dcUpdateStatus, "Loading rewritten texture");
-
-			cboCurrentTexture.SelectedIndex = (int)currentTexture;
-
-			bufferImage = getTexture(4096 + (currentTexture * 256 * 256 * 2));
-
-			imageUpdated = true;
-
-			enableControls();
-			mnuOpenFile.Enabled = true;
-            this.Invoke(dcUpdateStatus, "Ready");
-		}
-
-		#endregion
-
-		private void cmdGo_Click(object sender, System.EventArgs e)
+        private void cmdGo_Click(object sender, System.EventArgs e)
 		{
 			//user is a dumbfuck
 			if (cboCurrentTexture.SelectedIndex == -1)
@@ -726,7 +868,5 @@ namespace SoulReaverPCTextureUtility
             getTextureThread = new Thread(new ThreadStart(displayCurrentTexture));
             getTextureThread.Start();
  		}
-
-
-	}
+    }
 }

@@ -54,14 +54,23 @@ namespace SoulReaverPCTextureUtility
 		//is the texture file open?
 		protected bool fileIsOpen;
 
-		//does the display image need to be updated?
-		protected bool imageUpdated;
+        //length of the header
+        protected int headerLength;
+
+        //width of one texture
+        protected int textureWidth;
+
+        //height of one texture
+        protected int textureHeight;
+
+        //does the display image need to be updated?
+        protected bool imageUpdated;
 
 		//buffer image for the picturebox
 		protected Bitmap bufferImage;
 
 		//length of the file in bytes
-		protected ulong fileLength;
+		protected long fileLength;
 
 		//number of textures
 		protected uint totalTextures;
@@ -101,12 +110,29 @@ namespace SoulReaverPCTextureUtility
         private MenuItem mnuImportAll;
         private System.ComponentModel.IContainer components;
 
-		public frmMain()
+        public frmMain() : this(4096, 256, 256)
+        {
+        }
+
+        public frmMain(int headerLength, int textureWidth, int textureHeight)
 		{
 			//
 			// Required for Windows Form Designer support
 			//
 			InitializeComponent();
+
+            this.headerLength = headerLength;
+            this.textureWidth = textureWidth;
+            this.textureHeight = textureHeight;
+
+            this.SuspendLayout();
+            this.Width += (this.textureWidth - 256);
+            this.Height += (this.textureHeight - 256);
+            this.imgDisplay.SuspendLayout();
+            this.imgDisplay.Width = this.textureWidth;
+            this.imgDisplay.Height = this.textureHeight;
+            this.imgDisplay.ResumeLayout();
+            this.ResumeLayout();
 
 			//
 			// TODO: Add any constructor code after InitializeComponent call
@@ -292,7 +318,7 @@ namespace SoulReaverPCTextureUtility
             // 
             this.pnlStatus.Controls.Add(this.lblStatus);
             this.pnlStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlStatus.Location = new System.Drawing.Point(0, 289);
+            this.pnlStatus.Location = new System.Drawing.Point(0, 346);
             this.pnlStatus.Name = "pnlStatus";
             this.pnlStatus.Size = new System.Drawing.Size(272, 32);
             this.pnlStatus.TabIndex = 3;
@@ -309,7 +335,7 @@ namespace SoulReaverPCTextureUtility
             // frmMain
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(272, 321);
+            this.ClientSize = new System.Drawing.Size(272, 378);
             this.Controls.Add(this.pnlStatus);
             this.Controls.Add(this.gboTextureSet);
             this.Controls.Add(this.imgDisplay);
@@ -330,9 +356,36 @@ namespace SoulReaverPCTextureUtility
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main() 
+		static void Main(string[] args) 
 		{
-			Application.Run(new frmMain());
+            bool haveHeaderLength = false;
+            bool haveSize = false;
+            int headerLength = 4096;
+            int textureWidth = 256;
+            int textureHeight = 256;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                int temp;
+                if (!haveSize && args[i] == "-size" &&
+                    (i + 1) < args.Length && int.TryParse(args[i + 1], out temp))
+                {
+                    textureWidth = temp;
+                    textureHeight = temp;
+                    haveSize = true;
+                    continue;
+                }
+
+                if (!haveHeaderLength && args[i] == "-headerLength" &&
+                    (i + 1) < args.Length && int.TryParse(args[i + 1], out temp))
+                {
+                    headerLength = temp;
+                    haveHeaderLength = true;
+                    continue;
+                }
+            }
+
+            Application.Run(new frmMain(headerLength, textureWidth, textureHeight));
 		}
 
 		#region Menu options
@@ -560,15 +613,19 @@ namespace SoulReaverPCTextureUtility
 			//get file length/number of textures
 			FileInfo fInfo;
 			fInfo = new FileInfo(filePath);
-			fileLength = (ulong)fInfo.Length;
+			fileLength = fInfo.Length;
 
-			//number of textures = (filelength - header(4096)) / (256 * 256 * 2)
-			totalTextures = (uint)(fileLength - 4096) / (256 * 256 * 2) - 1;
+			totalTextures = (uint)((fileLength - (long)headerLength) / (long)(textureWidth * textureHeight * 2) - 1);
 
 			updateTexDropdown();
 			enableControls();
             this.Invoke(dcUpdateStatus, "Ready");
 		}
+
+        long getTextureOffset(int textureIndex)
+        {
+            return (long)headerLength + ((long)textureIndex * (long)(textureWidth * textureHeight * 2));
+        }
 
 		private void exportCurrent()
         {
@@ -606,7 +663,7 @@ namespace SoulReaverPCTextureUtility
 			for (iEA = 0; iEA <= totalTextures; iEA++)
 			{
                 this.Invoke(dcUpdateStatus, "Exporting texture " + iEA + " of " + totalTextures); 
- 				tempBitmap = getTexture((long)(4096 + (iEA * 256 * 256 * 2)));
+ 				tempBitmap = getTexture(getTextureOffset(iEA));
                 tempBitmap.Save(exportPath + "\\Texture-" + zeroFill(iEA.ToString(), 5) + ".PNG", System.Drawing.Imaging.ImageFormat.Png);
 			}
 
@@ -625,9 +682,9 @@ namespace SoulReaverPCTextureUtility
 
             Bitmap tempBitmap;
             tempBitmap = new Bitmap(importPath);
-            if ((tempBitmap.Size.Width != 256) || (tempBitmap.Size.Height != 256))
+            if ((tempBitmap.Size.Width != textureWidth) || (tempBitmap.Size.Height != textureHeight))
             {
-                MessageBox.Show("You MUST use a PNG image that is 256x256 pixels", "Incorrect File Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("You MUST use a PNG image that is textureWidthxtextureHeight pixels", "Incorrect File Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -643,11 +700,11 @@ namespace SoulReaverPCTextureUtility
 
             colour = new Color();
 
-            fStream.Seek(4096 + (currentTexture * 256 * 256 * 2), SeekOrigin.Begin);
+            fStream.Seek(getTextureOffset((int)currentTexture), SeekOrigin.Begin);
 
-            for (iGT = 0; iGT <= 255; iGT++)
+            for (iGT = 0; iGT < textureHeight; iGT++)
             {
-                for (jGT = 0; jGT <= 255; jGT++)
+                for (jGT = 0; jGT < textureWidth; jGT++)
                 {
                     colour = tempBitmap.GetPixel(jGT, iGT);
                     a = (ushort)(colour.A >> aFactor);
@@ -669,7 +726,7 @@ namespace SoulReaverPCTextureUtility
 
             cboCurrentTexture.SelectedIndex = (int)currentTexture;
 
-            bufferImage = getTexture(4096 + (currentTexture * 256 * 256 * 2));
+            bufferImage = getTexture(getTextureOffset((int)currentTexture));
 
             imageUpdated = true;
 
@@ -721,15 +778,15 @@ namespace SoulReaverPCTextureUtility
                     if (dictionary.ContainsKey((uint)iEA))
                     {
                         tempBitmap = new Bitmap(Path.Combine(importPath, dictionary[(uint)iEA]));
-                        if ((tempBitmap.Size.Width != 256) || (tempBitmap.Size.Height != 256))
+                        if ((tempBitmap.Size.Width != textureWidth) || (tempBitmap.Size.Height != textureHeight))
                         {
                             tempBitmap.Dispose();
-                            tempBitmap = new Bitmap(256, 256);
+                            tempBitmap = new Bitmap(textureWidth, textureHeight);
                         }
                     }
                     else
                     {
-                        tempBitmap = new Bitmap(256, 256);
+                        tempBitmap = new Bitmap(textureWidth, textureHeight);
                     }
 
                     int iGT, jGT;
@@ -744,11 +801,11 @@ namespace SoulReaverPCTextureUtility
 
                     colour = new Color();
 
-                    fStream.Seek(4096 + (iEA * 256 * 256 * 2), SeekOrigin.Begin);
+                    fStream.Seek(getTextureOffset(iEA), SeekOrigin.Begin);
 
-                    for (iGT = 0; iGT <= 255; iGT++)
+                    for (iGT = 0; iGT < textureHeight; iGT++)
                     {
-                        for (jGT = 0; jGT <= 255; jGT++)
+                        for (jGT = 0; jGT < textureWidth; jGT++)
                         {
                             colour = tempBitmap.GetPixel(jGT, iGT);
                             a = (ushort)(colour.A >> aFactor);
@@ -769,13 +826,13 @@ namespace SoulReaverPCTextureUtility
                     tempBitmap.Dispose();
                 }
 
-                fileLength = (ulong)fStream.Length;
+                fileLength = fStream.Length;
 
                 fStream.Seek(2, SeekOrigin.Begin);
                 bWriter.Write((ushort)dictionary.Count);
                 fStream.Seek(0, SeekOrigin.Begin);
 
-                //bufferImage = getTexture(4096 + (currentTexture * 256 * 256 * 2));
+                //bufferImage = getTexture(getTextureOffset(currentTexture));
                 //imageUpdated = true;
             }
 
@@ -792,7 +849,7 @@ namespace SoulReaverPCTextureUtility
             mDelegate dcUpdateStatus = new mDelegate(updateStatus);
             this.Invoke(dcUpdateStatus, "Reading texture");
              //updateStatus("Reading texture: " + cboCurrentTexture.SelectedText);
-            bufferImage = getTexture((long)(4096 + (currentTextureIndex * 256 * 256 * 2)));
+            bufferImage = getTexture(getTextureOffset(currentTextureIndex));
 			imageUpdated = true;
             //updateStatus("Ready");
             this.Invoke(dcUpdateStatus, "Ready");
@@ -812,13 +869,13 @@ namespace SoulReaverPCTextureUtility
 			bFactor = 3;
 
 	        colour = new Color();
-	        retBitmap = new Bitmap(256, 256);
+	        retBitmap = new Bitmap(textureWidth, textureHeight);
 
 			fStream.Seek(offset, SeekOrigin.Begin);
 
-			for (iGT = 0; iGT <= 255; iGT++)
+			for (iGT = 0; iGT < textureHeight; iGT++)
 			{
-				for (jGT = 0; jGT <= 255; jGT++)
+				for (jGT = 0; jGT < textureWidth; jGT++)
 				{
 	                pixelData = bReader.ReadUInt16();
 					a = pixelData;

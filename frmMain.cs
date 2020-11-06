@@ -367,7 +367,7 @@ namespace SoulReaverPCTextureUtility
             for (int i = 0; i < args.Length; i++)
             {
                 int temp;
-                if (!haveSize && args[i] == "-size" &&
+                if (!haveSize && args[i] == "-textureSize" &&
                     (i + 1) < args.Length && int.TryParse(args[i + 1], out temp))
                 {
                     textureWidth = temp;

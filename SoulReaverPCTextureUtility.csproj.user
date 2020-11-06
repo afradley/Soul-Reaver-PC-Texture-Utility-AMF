@@ -22,7 +22,7 @@
     <RemoteDebugMachine>
     </RemoteDebugMachine>
     <StartAction>Project</StartAction>
-    <StartArguments>-size 1024 -headerLength 4096</StartArguments>
+    <StartArguments>-textureSize 1024 -headerLength 4096</StartArguments>
     <StartPage>
     </StartPage>
     <StartProgram>

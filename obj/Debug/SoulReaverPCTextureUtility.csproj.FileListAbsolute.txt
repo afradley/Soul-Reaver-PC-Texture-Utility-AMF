@@ -12,3 +12,4 @@ C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Debug\SoulRe
 C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Debug\SoulReaverPCTextureUtility.csproj.CoreCompileInputs.cache
 C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Debug\SoulReaverPCTextureUtility.exe
 C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Debug\SoulReaverPCTextureUtility.pdb
+C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Debug\SoulReaverPCTextureUtility.csprojAssemblyReference.cache

@@ -4,9 +4,3 @@ C:\Users\Andrew\source\repos\SoulReaverPCTextureUtility\obj\Release\SoulReaverPC
 C:\Users\Andrew\source\repos\SoulReaverPCTextureUtility\obj\Release\SoulReaverPCTextureUtility.csproj.GenerateResource.cache
 C:\Users\Andrew\source\repos\SoulReaverPCTextureUtility\obj\Release\SoulReaverPCTextureUtility.csproj.CoreCompileInputs.cache
 C:\Users\Andrew\source\repos\SoulReaverPCTextureUtility\obj\Release\SoulReaverPCTextureUtility.exe
-C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\bin\Release\SoulReaverPCTextureUtility.exe
-C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Release\SoulReaverPCTextureUtility.csprojAssemblyReference.cache
-C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Release\SoulReaverPCTextureUtility.frmMain.resources
-C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Release\SoulReaverPCTextureUtility.csproj.GenerateResource.cache
-C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Release\SoulReaverPCTextureUtility.csproj.CoreCompileInputs.cache
-C:\Users\Andrew\source\repos\Soul-Reaver-PC-Texture-Utility-AMF\obj\Release\SoulReaverPCTextureUtility.exe
